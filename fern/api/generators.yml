@@ -3,7 +3,7 @@ groups:
   local:
     generators:
       - name: fernapi/fern-typescript-sdk
-        version: 0.0.273
+        version: 0.0.279
         output:
           location: local-file-system
           path: ../../generated/typescript
