@@ -1,4 +1,4 @@
-# {Company} API
+# Scale API
 
 Tagging a release on this repository will update the:
 
