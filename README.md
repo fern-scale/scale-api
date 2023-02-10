@@ -2,9 +2,8 @@
 
 Tagging a release on this repository will update the:
 
-- [Node.js SDK repo](https://github.com/fern-{company}/{company}-node)
-- [OpenAPI spec repo](https://github.com/fern-{company}/{company}-openapi)
-- [Postman collection repo](https://github.com/fern-{company}/{company}-postman)
+- [Node.js SDK repo](https://github.com/fern-scale/scale-node)
+- [Postman collection repo](https://github.com/fern-scale/scale-postman)
 - _More SDKs to come..._
 
 ## What is in this repository?
@@ -16,7 +15,7 @@ This repository contains
 
 ## What is in the API Definition?
 
-The API Definition contains information about what endpoints, types, and errors are used in the API. The definition is broken into smaller files such as [{TODO}.yml](fern/api/definition/{TODO}.yml) and [{TODO}.yml](fern/api/definition/{TODO}.yml).
+The API Definition contains information about what endpoints, types, and errors are used in the API. The definition is broken into smaller files such as [projects.yml](fern/api/definition/projects.yml).
 
 To make sure that the definition is valid, you can use the Fern CLI.
 
