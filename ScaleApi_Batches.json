@@ -1,0 +1,582 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Batches",
+    "description": "Readme API spec doc: Batches",
+    "termsOfService": "#"
+  },
+  "servers": [
+    {
+      "url": "https://api.scale.com/v1"
+    }
+  ],
+  "security": [{ "basicAuth": [] }],
+  "paths": {
+    "/batches": {
+      "post": {
+        "description": "Create a new Batch within a project. Batches will be created with a status of `in_progress`. For users participating in our \"Scale Rapid\" Early Access, batches will be created with a status of `staging`. See the [Batch Overview](/reference/batch-overview) for additional details.",
+        "tags": ["Batch Overview"],
+        "summary": "Batch Creation",
+        "operationId": "batch-creation",
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["project", "name"],
+                "properties": {
+                  "project": {
+                    "type": "string",
+                    "description": "The name of the project this batch (and its tasks) belong to",
+                    "default": "kitten_labeling"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Name identifying this batch. Must be unique among all batches belonging to a customer.",
+                    "default": "kitten_labeling_2020-07"
+                  },
+                  "callback": {
+                    "type": "string",
+                    "description": "The full url (including the scheme `http://` or `https://`) or email address of the [callback](/reference/callbacks) that will be used when the task is completed."
+                  },
+                  "calibration_batch": {
+                    "type": "boolean",
+                    "description": "Only applicable for Rapid projects. Create an calibration batch by setting the calibration_batch flag to true.",
+                    "default": false
+                  },
+                  "self_label_batch": {
+                    "type": "boolean",
+                    "description": "Only applicable for Rapid projects. Create a self label batch by setting the self_label_batch flag to true.",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resBatchCreation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request -- The request was unacceptable, often due to missing a required parameter."
+          },
+          "401": {
+            "description": "Unauthorized -- No valid API key provided."
+          },
+          "402": {
+            "description": "Not enabled -- Please contact sales@scaleapi.com before creating this type of task."
+          },
+          "404": {
+            "description": "Not Found -- The requested resource doesn't exist."
+          },
+          "409": {
+            "description": "Conflict -- The provided idempotency key is already in use for a different request."
+          },
+          "429": {
+            "description": "Too Many Requests -- Too many requests hit the API too quickly."
+          },
+          "500": {
+            "description": "Internal Server Error -- We had a problem with our server. Try again later."
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      },
+      "get": {
+        "tags": ["Batch Overview"],
+        "summary": "List All Batches",
+        "description": "This is a paged endpoint for all of your batches. Batches will be returned in descending order based on `created_at`. Pagination is based off `limit` and `offset` parameters, which determine the page size and how many results to skip.",
+        "operationId": "batch-list",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "kitten_labeling"
+            },
+            "description": "Project name to filter batches by"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "in_progress"
+            },
+            "description": "Status to filter batches by (`staging` or `in_progress` or `completed`)"
+          },
+          {
+            "name": "start_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2020-05-21"
+            },
+            "description": "The minimum value of `created_at` for batches to be returned"
+          },
+          {
+            "name": "end_time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "2021-01-01"
+            },
+            "description": "The maximum value of `created_at` for batches to be returned"
+          },
+          {
+            "name": "completed_after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The minimum value of 'completed_at' for batches to be returned"
+          },
+          {
+            "name": "completed_before",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The maximum value of 'completed_at' for batches to be returned"
+          },
+          {
+            "name": "audited_after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The minimum value of 'last_audited_at' for batches to be returned"
+          },
+          {
+            "name": "audited_before",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The maximum value of 'last_audited_at' for batches to be returned"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100
+            },
+            "description": "Number between 1&ndash;100, number of results per page (default 100)"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Number of results to skip for showing following pages (default 0)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "GetProductListCount",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resListAllBatches"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Response to a POST that results in a creation."
+          },
+          "204": {
+            "description": "Response to a successful request that won't be returning a body."
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          },
+          "501": {
+            "description": "Not Implemented (The method you have called has not been implemented)"
+          },
+          "503": {
+            "description": "Rate Limit Exceeded"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/batches/{batchName}/finalize": {
+      "post": {
+        "description": "For \"Scale Rapid and Studio\" customers only, finalizes a batch with name `batchName` so its tasks can be worked on.\n\nNon-(Rapid/Studio) customers do not need to use this endpoint - calling this endpoint will not do anything, but still return a `200` success status code.",
+        "tags": ["Batch Overview"],
+        "summary": "Finalize Batch",
+        "operationId": "batch-finalization",
+        "parameters": [
+          {
+            "name": "batchName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "kitten_labeling_2020-07"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ActiveLocation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resFinalizeBatch"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Response to a POST that results in a creation."
+          },
+          "204": {
+            "description": "Response to a successful request that won't be returning a body."
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          },
+          "501": {
+            "description": "Not Implemented (The method you have called has not been implemented)"
+          },
+          "503": {
+            "description": "Rate Limit Exceeded"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/batches/{batchName}": {
+      "get": {
+        "description": "This endpoint returns the details of a batch with the name `:batchName`.",
+        "tags": ["Batch Overview"],
+        "summary": "Batch Retrieval",
+        "operationId": "batch-retrieval",
+        "parameters": [
+          {
+            "name": "batchName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "kitten_labeling_2020-07"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ActiveLocation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resBatchRetrieval"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Response to a POST that results in a creation."
+          },
+          "204": {
+            "description": "Response to a successful request that won't be returning a body."
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          },
+          "501": {
+            "description": "Not Implemented (The method you have called has not been implemented)"
+          },
+          "503": {
+            "description": "Rate Limit Exceeded"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/batches/{batchName}/status": {
+      "get": {
+        "description": "This endpoint returns the status of a batch with the name `:batchName`, as well as the counts of its tasks grouped by task status.",
+        "tags": ["Batch Overview"],
+        "summary": "Batch Status",
+        "operationId": "batch-status",
+        "parameters": [
+          {
+            "name": "batchName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "kitten_labeling_2020-07"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ActiveLocation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resBatchStatus"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Response to a POST that results in a creation."
+          },
+          "204": {
+            "description": "Response to a successful request that won't be returning a body."
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          },
+          "501": {
+            "description": "Not Implemented (The method you have called has not been implemented)"
+          },
+          "503": {
+            "description": "Rate Limit Exceeded"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "resBatchCreation": {
+        "type": "object",
+        "properties": {
+          "project": {
+            "type": "string",
+            "default": "kitten_labeling"
+          },
+          "name": {
+            "type": "string",
+            "default": "kitten_labeling_2020-07"
+          },
+          "status": {
+            "type": "string",
+            "default": "staging"
+          },
+          "callback": {
+            "type": "string",
+            "default": "https://example.com/callback"
+          },
+          "created_at": {
+            "type": "string",
+            "default": "2020-07-01T09:09:10.108Z"
+          }
+        }
+      },
+      "resFinalizeBatch": {
+        "type": "object",
+        "properties": {
+          "project": {
+            "type": "string",
+            "default": "kitten_labeling"
+          },
+          "name": {
+            "type": "string",
+            "default": "kitten_labeling_2020-07"
+          },
+          "status": {
+            "type": "string",
+            "default": "in_progress"
+          },
+          "callback": {
+            "type": "string",
+            "default": "https://example.com/callback"
+          },
+          "created_at": {
+            "type": "string",
+            "default": "2020-07-01T09:09:10.108Z"
+          }
+        }
+      },
+      "resBatchRetrieval": {
+        "type": "object",
+        "properties": {
+          "project": {
+            "type": "string",
+            "default": "kitten_labeling"
+          },
+          "name": {
+            "type": "string",
+            "default": "kitten_labeling_2020-07"
+          },
+          "status": {
+            "type": "string",
+            "default": "staging"
+          },
+          "callback": {
+            "type": "string",
+            "default": "https://example.com/callback"
+          },
+          "created_at": {
+            "type": "string",
+            "default": "2020-07-01T09:09:10.108Z"
+          }
+        }
+      },
+      "resBatchStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "default": "staging"
+          },
+          "pending": {
+            "type": "integer",
+            "default": 20
+          }
+        }
+      },
+      "resListAllBatches": {
+        "type": "object",
+        "properties": {
+          "docs": {
+            "type": "array",
+            "xml": {
+              "name": "Data",
+              "wrapped": true
+            },
+            "items": {
+              "$ref": "#/components/schemas/subresListAllBatches"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "default": 1
+          },
+          "limit": {
+            "type": "integer",
+            "default": 100
+          },
+          "offset": {
+            "type": "integer",
+            "default": 0
+          },
+          "has_more": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "subresListAllBatches": {
+        "type": "object",
+        "properties": {
+          "project": {
+            "type": "string",
+            "default": "kitten_labeling"
+          },
+          "name": {
+            "type": "string",
+            "default": "kitten_labeling_2018-07"
+          },
+          "status": {
+            "type": "string",
+            "default": "staging"
+          },
+          "callback": {
+            "type": "string",
+            "default": "http://mycallback.com"
+          },
+          "created_at": {
+            "type": "string",
+            "default": "2018-08-01T09:09:10.108Z"
+          }
+        }
+      }
+    }
+  }
+}

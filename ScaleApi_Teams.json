@@ -1,0 +1,226 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "Teams",
+    "description": "Readme API spec doc: Teams",
+    "termsOfService": "#"
+  },
+  "servers": [
+    {
+      "url": "https://api.scale.com/v1"
+    }
+  ],
+  "security": [{ "basicAuth": [] }],
+  "paths": {
+    "/teams": {
+      "get": {
+        "tags": ["Teams Overview"],
+        "summary": "List All Teammates",
+        "description": "Retrieves basic information about all team members associate with your account.",
+        "operationId": "teams-list",
+        "responses": {
+          "200": {
+            "description": "Teams list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resListTeams"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/teams/invite": {
+      "post": {
+        "description": "Invites one or multiple users by email to your team. `team_role` can be either `labeler`, `member`, or `manager`. Returns information about all team members.",
+        "tags": ["Teams Overview"],
+        "summary": "Invite Teammate",
+        "operationId": "invite-teammate",
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamsInvite"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created teammates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resTeamsInvite"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/teams/set_role": {
+      "post": {
+        "description": "Changes the role of non-admin team members. `emails` should be a list of emails of team members who are either labelers, members, managers, or disabled. `team_role` should be one of `labeler`, `member`, or `manager`. Returns information about all members of your team.",
+        "tags": ["Teams Overview"],
+        "summary": "Update Teammate Role",
+        "operationId": "update-teammate-role",
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamsInvite"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Updated teammates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resTeamsInvite"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "Teammate": {
+        "type": "object",
+        "required": ["email", "role"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Teammate email"
+          },
+          "role": {
+            "type": "string",
+            "description": "Teammate role, can be of `labeler` (Studio only), `member`, `manager`."
+          },
+          "company": {
+            "type": "string",
+            "description": "Teammate company"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Teammate first name"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Teammate last name"
+          },
+          "isStudioLabeler": {
+            "type": "boolean",
+            "description": "Is teammate a Studio labeler?"
+          },
+          "expiry": {
+            "type": "string",
+            "description": "If teammate status is `invited`, this field indicates when the invitation will expire."
+          }
+        }
+      },
+      "TeamsInvite": {
+        "type": "object",
+        "required": ["emails", "team_role"],
+        "properties": {
+          "emails": {
+            "type": "array",
+            "description": "Array of emails of teammates you want to invite.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "team_role": {
+            "type": "string",
+            "description": "Role of invited teammate. Allowed values are: `labeler` (Studio only), `member`, or `manager`."
+          }
+        }
+      },
+      "resListTeams": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Teammate"
+        }
+      },
+      "resTeamsInvite": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Teammate"
+        }
+      }
+    }
+  }
+}

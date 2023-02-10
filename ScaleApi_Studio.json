@@ -1,0 +1,717 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "Studio",
+    "description": "Readme API spec doc: Studio",
+    "termsOfService": "#"
+  },
+  "servers": [
+    {
+      "url": "https://api.scale.com/v1"
+    }
+  ],
+  "security": [{ "basicAuth": [] }],
+  "paths": {
+    "/studio/assignments": {
+      "get": {
+        "tags": ["Studio Assignments"],
+        "summary": "List All Assignments",
+        "description": "Gets the current project assignments of all active users in your team (does not include “invited” or “disabled” team members).",
+        "operationId": "assignments-list",
+        "responses": {
+          "200": {
+            "description": "Assignments list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resListAssignments"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/studio/assignments/add": {
+      "post": {
+        "description": "Assigns provided projects to specified team members. Returns all team members and their assignments.",
+        "tags": ["Studio Assignments"],
+        "summary": "Assign Teammate",
+        "operationId": "assign-teammate",
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTeammate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Assigned teammates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resUpdateAssignments"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/studio/assignments/remove": {
+      "post": {
+        "description": "Unassigns provided projects from specified team members. Returns all team members and their assignments.",
+        "tags": ["Studio Assignments"],
+        "summary": "Unassign Teammate",
+        "operationId": "unassign-teammate",
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTeammate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Unassigned teammates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resUpdateAssignments"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/studio/projects/{project}/groups": {
+      "get": {
+        "description": "Returns all labeler groups for the project specified in URL.",
+        "tags": ["Studio Project Groups"],
+        "summary": "List Project Groups",
+        "operationId": "list-project-groups",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "project_name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project group list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resProjectGroup"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      },
+      "post": {
+        "description": "Creates a group with the provided name for the project specified in the URL and adds team members. Only returns information about that specific group. Team members must be assigned to the specified project to be added to a group in that project.",
+        "tags": ["Studio Project Groups"],
+        "summary": "Create Project Group",
+        "operationId": "create-project-group",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "project_name"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["emails", "name"],
+                "properties": {
+                  "emails": {
+                    "type": "array",
+                    "description": "List of emails",
+                    "items": {
+                      "type": "string",
+                      "description": "Teammate email"
+                    }
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Name of project group"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Project group list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resProjectGroup"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/studio/projects/{project}/groups/{group}": {
+      "put": {
+        "description": "Adds or removes team members from specified labeler group. Only returns information about that specific group.",
+        "tags": ["Studio Project Groups"],
+        "summary": "Update Project Group",
+        "operationId": "update-project-group",
+        "parameters": [
+          {
+            "name": "project",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "project_name"
+            }
+          },
+          {
+            "name": "group",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "group_name"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "add_emails": {
+                    "type": "array",
+                    "description": "List of emails",
+                    "items": {
+                      "type": "string",
+                      "description": "Teammate email"
+                    }
+                  },
+                  "remove_emails": {
+                    "type": "array",
+                    "description": "List of emails",
+                    "items": {
+                      "type": "string",
+                      "description": "Teammate email"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Project group list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resProjectGroup"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/studio/batches": {
+      "get": {
+        "description": "Returns basic information about all pending batches, in order of priority.",
+        "tags": ["Studio Batches"],
+        "summary": "List Batches",
+        "operationId": "list-batches",
+        "responses": {
+          "200": {
+            "description": "Project batches list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resBatchesList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/studio/batches/{batch}": {
+      "put": {
+        "description": "Sets (not adds to) labeler group assignment for the specified batch. You can add individual members as well by specifying their email as a group name. Returns information only about the specified batch.",
+        "tags": ["Studio Batches"],
+        "summary": "Assign Batches",
+        "operationId": "set-batch-groups",
+        "parameters": [
+          {
+            "name": "batch",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "batch_name"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "groups": {
+                    "type": "array",
+                    "description": "List of group names",
+                    "items": {
+                      "type": "string",
+                      "description": "Group name"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Batch Info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Batch"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/studio/batches/set_priorities": {
+      "post": {
+        "description": "Sets the priority of your batches based on the order of your input. The batches field of the body must be an array of objects, each with variable “name”, each representing a pending batch. You can use the response from the batches endpoint to retrieve all pending Studio batches, then rearrange the batches in the returned array. You must include ALL of the pending batches in your request. Returns all batches in new priority order.",
+        "tags": ["Studio Batches"],
+        "summary": "Set Batches Priorities",
+        "operationId": "set-batches-priorities",
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "groups": {
+                    "type": "array",
+                    "description": "List of batch names",
+                    "items": {
+                      "type": "object",
+                      "description": "Batch name object",
+                      "required": ["name"],
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Batch name"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated Batch List",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resBatchesList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/studio/batches/reset_priorities": {
+      "post": {
+        "description": "Restores batch priority order to default order. Default order is sorted by calibration batches first, then by creation date. Returns all batches in new priority order.",
+        "tags": ["Studio Batches"],
+        "summary": "Reset Batches Priorities",
+        "operationId": "reset-batches-priorities",
+        "responses": {
+          "200": {
+            "description": "Updated Batch List",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resBatchesList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "Assignment": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "description": "Project name"
+        }
+      },
+      "AssignTeammate": {
+        "type": "object",
+        "required": ["emails", "projects"],
+        "properties": {
+          "emails": {
+            "type": "array",
+            "description": "Array of emails of teammates.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "projects": {
+            "type": "array",
+            "description": "Array of projects to assign.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "resListAssignments": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/Assignment"
+        }
+      },
+      "resUpdateAssignments": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/Assignment"
+        }
+      },
+      "Workers": {
+        "type": "object",
+        "required": ["id", "email"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "worker id"
+          },
+          "email": {
+            "type": "string",
+            "description": "worker email"
+          }
+        }
+      },
+      "WorkersList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Workers"
+        }
+      },
+      "resProjectGroup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Project group id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of project group"
+          },
+          "numWorkers": {
+            "type": "integer",
+            "description": "Number of workers in project group"
+          },
+          "isSingleton": {
+            "type": "boolean",
+            "description": "Is this project group for 1 teammate?"
+          },
+          "workers": {
+            "$ref": "#/components/schemas/WorkersList"
+          }
+        }
+      },
+      "Batch": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Batch id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Batch name"
+          },
+          "projectId": {
+            "type": "string",
+            "description": "Project id"
+          },
+          "projectName": {
+            "type": "string",
+            "description": "Project name"
+          },
+          "batchType": {
+            "type": "string",
+            "description": "Batch type, can be `Production` or `Calibration`"
+          },
+          "studioPriority": {
+            "type": "integer",
+            "description": "Priority of batch"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total tasks in batch"
+          },
+          "completed": {
+            "type": "integer",
+            "description": "Completed tasks in batch"
+          },
+          "groups": {
+            "type": "array",
+            "description": "List of project groups in batch",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "resBatchesList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Batch"
+        }
+      }
+    }
+  }
+}

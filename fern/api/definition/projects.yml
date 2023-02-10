@@ -1,0 +1,155 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  tasks: tasks.yml
+
+service:
+  auth: true
+  base-path: /projects
+  endpoints:
+    list:
+      path: ""
+      method: GET
+      docs: >-
+        List information for all projects. **Note:** No parameters required.
+        Optionally, set a boolean value for `archived` to only list information
+        for all (un)archived projects.
+      display-name: List All Projects
+      request:
+        name: ListProjectsRequest
+        query-parameters:
+          archived:
+            docs: >-
+              List information for only archived or only unarchived projects. If
+              omitted, information for all projects will be listed.
+            type: optional<boolean>
+      response: list<Project>
+
+    create:
+      path: ""
+      method: POST
+      docs: ""
+      display-name: Project Creation
+      request: 
+        name: CreateProjectRequest
+        body: 
+          properties: 
+            type:
+              docs: The task type of all the tasks belonging to this project
+              type: tasks.TaskType
+            name:
+              docs: >-
+                Name identifying this project. Must be unique among all your projects.
+                When creating tasks for this project, you should add a `project:
+                <name>` parameter to the task creation request to associate the task
+                with this project.
+              type: string
+            rapid:
+              docs: >-
+                Whether the project being created is a Scale Rapid project. Enterprise
+                and On-Demand customers should omit this value.
+              type: optional<boolean>
+            params:
+              docs: >-
+                Default parameters for tasks created under this project. Any
+                parameters specified here will be set if omitted in a task request;
+                they will be overridden by any values sent in the task request.
+                `params.instruction` behaves slightly differently; values here will
+                instead be appended after the task-level instruction.
+              type: optional<map<string, unknown>>
+      response: Project
+
+    get:
+      path: /{Name}
+      method: GET
+      docs: Retrieve information about a single project.
+      display-name: Project Retrieval
+      path-parameters:
+        Name: string
+      response: Project
+
+    updateParameters:
+      path: /{Name}/setParams
+      method: POST
+      docs: >-
+        You can set parameters on a project. Project-level-parameters will be
+        set on future tasks created under this project if they are not set in
+        the task request. Any parameters specified in the task request will
+        override any project parameter.
+        Projects keep a history of the parameters that they were set with. Tasks
+        created under a project inherit the latest params of the project (the
+        last entry in param_history), one can also specify project_version when
+        creating a task to inherit from an older set of params (or use -1 to
+        skip parameter inheritance altogether.)
+        Tasks have a `project_param_version` field pointing to the project
+        version in place at the time a task was created.
+        If you haven't already, check out our [guide to using Project-level
+        parameters](/reference/using-project-versioning) to learn more about how
+        this workflow comes togeher.
+        Just want to see some examples? [We've added those as
+        well](/reference/examples-of-project-parameters).
+      display-name: Update Parameters (Project)
+      path-parameters:
+        Name: string
+      request:
+        name: UpdateProjectParametersRequest
+        body:
+          properties:
+            patch:
+              docs: >-
+                When generating the newest set of project parameters, whether or not
+                to combine the most recent project parameters with the parameters
+                specified in this request. Defaults to false. For example, if the
+                current params contains { instruction: 'label the cats in the image' }
+                and the latest call to this API contains the task parameter {
+                objects_to_annotate: ['cat'] }, whether or not patch is additionally
+                set will determine if the new project parameters also contain the
+                instruction “label the cats in the image”. Note that any fields set in
+                the API request completely override any fields from the previous
+                version; object or array values will not be merged.
+              type: optional<boolean>
+            instruction:
+              docs: >-
+                `instruction` field to combine with any specified task-level
+                instruction.
+              type: optional<string>
+      response: Project
+
+    setOntology:
+      path: /{Name}/setOntology
+      method: POST
+      docs: >-
+        You can set ontologies on a project. Ontologies will be referenced by
+        the tasks of a project. Projects keep a history of the ontologies they
+        were set with.
+        The ontology can be composed of a list of strings or
+        [OntologyChoice](/reference/ontology-nesting-and-options) objects.
+        Ontology choices and their subchoices must be unique throughout the
+        ontology.
+      display-name: Update Ontology (Project)
+      path-parameters:
+        Name: string
+      request:
+        name: SetOntologyRequest
+        body:
+          properties: 
+            ontology:
+              docs: A list of string or OntologyChoice objects.
+              type: list<unknown>
+            name:
+              docs: Name identifying the version of the ontology.
+              type: optional<string>
+
+types:
+  Project:
+    properties:
+      type: optional<string>
+      name: optional<string>
+      param_history: optional<list<ProjectPramHistory>>
+      created_at: optional<string>
+
+  ProjectPramHistory:
+    properties:
+      instruction: optional<string>
+      version: optional<integer>
+      created_at: optional<string>

@@ -1,0 +1,219 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+service:
+  auth: true
+  base-path: ""
+  endpoints:
+    get:
+      path: /task/{taskId}
+      method: GET
+      docs: This API endpoint retrieves a specific task.
+      display-name: Retrieve a Task
+      path-parameters:
+        taskId: string
+      response: Task
+
+    list:
+      path: /tasks
+      method: GET
+      docs: >-
+        This is a paginated endpoint that retrieves a list of your tasks.
+        The tasks will be returned in descending order based on `created_at`
+        time. All time filters expect an [ISO 8601-formatted
+        string](https://timestampgenerator.com/), like '2021-04-25' or
+        '2021-04-25T03:14:15-07:00'
+        The pagination is based on the `limit` and `next_token` parameters,
+        which determine the page size and the current page we are on. The value
+        of `next_token` is a unique pagination token for each page ([nerdy
+        details if you were
+        curious](https://www.mixmax.com/engineering/api-paging-built-the-right-way/)).
+        Make the call again using the returned token to retrieve the next page.
+      display-name: Retrieve Multiple tasks
+      request:
+        name: ListTasksRequest
+        query-parameters:
+          start_time:
+            docs: The minimum value of `created_at` for tasks to be returned
+            type: optional<string>
+          end_time:
+            docs: The maximum value of `created_at` for tasks to be returned
+            type: optional<string>
+          completed_after:
+            docs: The minimum value of `completed_at` for tasks to be returned
+            type: optional<string>
+          completed_before:
+            docs: The maximum value of `completed_at` for tasks to be returned
+            type: optional<string>
+          updated_after:
+            docs: The minimum value of `updated_at` for tasks to be returned
+            type: optional<string>
+          updated_before:
+            docs: The maximum value of `updated_at` for tasks to be returned
+            type: optional<string>
+          status:
+            docs: >-
+              The status of the task - can be: `completed`, `pending`, or
+              `canceled`
+            type: optional<string>
+          type:
+            docs: The type of the task
+            type: optional<string>
+          project:
+            docs: The name of the project that the returned tasks must belong to
+            type: optional<string>
+          batch:
+            docs: The name of the batch that the returned tasks must belong to
+            type: optional<string>
+          limit:
+            docs: >-
+              A number between 1 and 100, the maximum number of results to
+              display per page | optional, default 100
+            type: optional<integer>
+          include_attachment_url:
+            docs: >-
+              Set to true if the returned Task Object should include presigned
+              attachment urls.
+            type: optional<boolean>
+          next_token:
+            docs: >-
+              A token used to retrieve the next page of results if there are
+              more.
+            type: optional<string>
+      response: ListTasksResponse
+
+    cancel:
+      path: /task/{taskId}/cancel
+      method: POST
+      docs: >-
+        This endpoint cancels a task so that it will not be completed.
+        You may only cancel pending tasks, and the endpoint will return a 400
+        error code if you attempt to cancel a completed task
+        If the task to be cancled had a unique id, specifying
+        `clear_unique_id=true` will remove the unique id.  Canceling tasks is
+        idempotent such that calling this endpoint multiple times will still
+        return a 200 success response.
+      display-name: Cancel task
+      path-parameters:
+        taskId: string
+      request:
+        name: CancelTasksRequest
+        query-parameters:
+          clear_unique_id:
+            docs: >-
+              If `true`, will clear a task's `unique_id`, thus allowing the same
+              unique id to be used in future tasks.
+            type: optional<string>
+      response: Task
+
+    setMetadata:
+      path: /task/{taskId}/setMetadata
+      method: POST
+      docs: >-
+        This endpoint sets the `metadata` field on a task.
+        You may set the `metadata` field on any existing task using valid
+        key-value data.
+        Updating a task's `metadata` field is idempotent such that calling this
+        endpoint multiple times will still return a 200 success response.
+      display-name: Set task metadata
+      path-parameters:
+        taskId: string
+      request:
+        name: SetTaskMetadataRequest
+        body: 
+          properties:
+              docs: 
+                type: map<string, unknown>
+                docs: >- 
+                  A set of key/value pairs that you can attach to a task object. It can be
+                  useful for storing additional information about the task in a structured
+                  format. Max 10KB.
+      response: Task
+
+types:
+  ListTasksResponse:
+    properties:
+      docs: optional<list<Task>>
+      total: optional<integer>
+      limit: optional<integer>
+      has_more: optional<boolean>
+      next_token: optional<string>
+
+  TaskType: 
+    enum: 
+      - name: Annotation 
+        value: "annotation"
+      - name: Categorization 
+        value: "categorization"
+      - name: Comparison 
+        value: "comparison"
+      - name: CuboidAnnotation 
+        value: "cuboidannotation"
+      - name: DataCollection 
+        value: "datacollection"
+      - name: DocumentModel 
+        value: "documentmodel"
+      - name: DocumentTranscription 
+        value: "documenttranscription"
+      - name: ImageAnnotation 
+        value: "imageannotation"
+      - name: LaneAnnotation 
+        value: "laneannotation"
+      - name: LidarAnnotation 
+        value: "lidarannotation"
+      - name: LidarLinking 
+        value: "lidarlinking"
+      - name: LidarSegmentation 
+        value: "lidarsegmentation"
+      - name: LidarTopdown 
+        value: "lidartopdown"
+      - name: LineAnnotation 
+        value: "lineannotation"
+      - name: NamedEntityRecognition 
+        value: "namedentityrecognition"
+      - name: PointAnnotation 
+        value: "pointannotation"
+      - name: PolygonAnnotation 
+        value: "polygonannotation"
+      - name: SegmentAnnotation 
+        value: "segmentannotation"
+      - name: Transcription 
+        value: "transcription"
+      - name: TextCollection 
+        value: "textcollection"
+      - name: VideoAnnotation 
+        value: "videoannotation"
+      - name: VideoBoxAnnotation 
+        value: "videoboxannotation"
+      - name: VideoPlaybackAnnotation 
+        value: "videoplaybackannotation"
+      - name: VideoCuboidAnnotation 
+        value: "videocuboidannotation"
+    
+  Task:
+    properties:
+      task_id: optional<string>
+      created_at: optional<string>
+      callback_url: optional<string>
+      type: optional<string>
+      status: optional<string>
+      instruction: optional<string>
+      params: optional<TaskParams>
+      metadata:
+        docs: >-
+          A set of key/value pairs that you can attach to a task object. It can
+          be useful for storing additional information about the task in a
+          structured format. Max 10KB.
+        type: optional<map<string, unknown>>
+
+  Annotations:
+    properties:
+      objects_to_annotate: optional<list<string>>
+
+  TaskGeometries:
+    properties:
+      box: optional<Annotations>
+
+  TaskParams:
+    properties:
+      attachment: optional<string>
+      geometries: optional<TaskGeometries>

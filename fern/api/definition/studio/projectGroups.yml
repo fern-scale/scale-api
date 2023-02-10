@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+service:
+  auth: true
+  base-path: /studio/projects/{project}/groups
+  path-parameters:
+    project: string
+  endpoints:
+    list:
+      path: ""
+      method: GET
+      docs: Returns all labeler groups for the project specified in URL.
+      display-name: List Project Groups
+      response: ProjectGroup
+
+    create:
+      path: ""
+      method: POST
+      docs: >-
+        Creates a group with the provided name for the project specified in the
+        URL and adds team members. Only returns information about that specific
+        group. Team members must be assigned to the specified project to be
+        added to a group in that project.
+      display-name: Create Project Group
+      request:
+        name: CreateProjectGroupRequest
+        body:
+          properties:
+            emails:
+              docs: List of emails
+              type: list<string>
+            name:
+              docs: Name of project group
+              type: string
+
+    update:
+      path: /{group}
+      method: PUT
+      docs: >-
+        Adds or removes team members from specified labeler group. Only returns
+        information about that specific group.
+      display-name: Update Project Group
+      path-parameters:
+        group: string
+      request:
+        name: UpdateProjectGroupRequest
+        body:
+          properties:
+            add_emails:
+              docs: List of emails
+              type: optional<list<string>>
+            remove_emails:
+              docs: List of emails
+              type: optional<list<string>>
+
+types: 
+  ProjectGroup:
+    properties:
+      id:
+        docs: Project group id
+        type: optional<string>
+      name:
+        docs: Name of project group
+        type: optional<string>
+      numWorkers:
+        docs: Number of workers in project group
+        type: optional<integer>
+      isSingleton:
+        docs: Is this project group for 1 teammate?
+        type: optional<boolean>
+      workers: optional<list<Workers>>
+
+  Workers:
+    properties:
+      id:
+        docs: worker id
+        type: string
+      email:
+        docs: worker email
+        type: string

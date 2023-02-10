@@ -1,0 +1,102 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+service:
+  auth: true
+  base-path: /studio/batches
+  endpoints:
+    list:
+      path: ""
+      method: GET
+      docs: >-
+        Returns basic information about all pending batches, in order of
+        priority.
+      display-name: List Batches
+      response: list<Batch>
+
+    setGroups:
+      path: /{batch}
+      method: PUT
+      docs: >-
+        Sets (not adds to) labeler group assignment for the specified batch. You
+        can add individual members as well by specifying their email as a group
+        name. Returns information only about the specified batch.
+      display-name: Assign Batches
+      path-parameters:
+        batch: string
+      request:
+        name: SetBatchGroupRequest
+        body:
+          properties:
+            groups:
+              docs: List of group names
+              type: optional<list<string>>
+      response: Batch
+
+    setPriorities:
+      path: /set_priorities
+      method: POST
+      docs: >-
+        Sets the priority of your batches based on the order of your input. The
+        batches field of the body must be an array of objects, each with
+        variable “name”, each representing a pending batch. You can use the
+        response from the batches endpoint to retrieve all pending Studio
+        batches, then rearrange the batches in the returned array. You must
+        include ALL of the pending batches in your request. Returns all batches
+        in new priority order.
+      display-name: Set Batches Priorities
+      request:
+        name: SetBatchPrioritiesRequest
+        body:
+          properties:
+            groups:
+              docs: List of batch names
+              type: optional<list<BatchName>>
+      response: list<Batch>
+
+    resetPriorities:
+      path: /reset_priorities
+      method: POST
+      docs: >-
+        Restores batch priority order to default order. Default order is sorted
+        by calibration batches first, then by creation date. Returns all batches
+        in new priority order.
+      display-name: Reset Batches Priorities
+      response: list<Batch>
+
+types:
+  BatchName:
+    docs: Batch name object
+    properties:
+      name:
+        docs: Batch name
+        type: string
+
+  Batch:
+    properties:
+      id:
+        docs: Batch id
+        type: optional<string>
+      name:
+        docs: Batch name
+        type: optional<string>
+      projectId:
+        docs: Project id
+        type: optional<string>
+      projectName:
+        docs: Project name
+        type: optional<string>
+      batchType:
+        docs: Batch type, can be `Production` or `Calibration`
+        type: optional<string>
+      studioPriority:
+        docs: Priority of batch
+        type: optional<integer>
+      total:
+        docs: Total tasks in batch
+        type: optional<integer>
+      completed:
+        docs: Completed tasks in batch
+        type: optional<integer>
+      groups:
+        docs: List of project groups in batch
+        type: optional<list<string>>

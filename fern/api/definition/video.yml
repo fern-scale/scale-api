@@ -1,0 +1,368 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+service:
+  auth: true
+  base-path: ""
+  endpoints:
+    createPlaybackAnnotation:
+      path: /task/videoplaybackannotation
+      method: POST
+      docs: >-
+        This endpoint creates a `videoplaybackannotation` task. In this task, we
+        will view the given video file and draw annotation around the specified
+        objects.
+        You are required to provide a URL to the video file as the `attachment`.
+        It can be in `mp4`, `webm`, or `ogg` format.
+        You can optionally provide additional markdown-enabled or Google
+        Doc-based [instructions](https://scale.com/docs/instructions) via the
+        `instruction` parameter.
+        You may optionally specify a `frame_rate`, which will determine how many
+        frames per second will be used to annotate the given video. The default
+        value is `1`.
+        You may also optionally specify `events_to_annotate`, a list of strings
+        describing [events section](/reference/events) to annotate in the video.
+        If the request is successful, Scale will return the generated task
+        object, at which point you should store the `task_id` to have a
+        permanent reference to the task.
+      display-name: Video Playback
+      request: VideoPlaybackAnnotationRequest
+      response: VideoPlaybackAnnotationResponse
+
+    createGeneralAnnotation: 
+      path: /task/videoannotation
+      method: POST
+      docs: >-
+        ### **Note: Scale Video is only available for our Enterprise
+        customers**. If you want to learn more, please contact our [sales
+        team](https://scale.com/sales).
+        This endpoint creates a `videoannotation` task. Given a series of images
+        sampled from a video (which we will refer to as "frames"), Scale will
+        annotate each frame with the Geometries (`box`, `polygon`, `line`,
+        `point`, `cuboid,` and `ellipse`) you specify.
+        The required parameter for this task is `geometries`.
+        You can optionally provide additional markdown-enabled or Google
+        Doc-based [instructions](https://scale.com/docs/instructions) via the
+        `instruction` parameter.
+        You may also optionally specify `events_to_annotate`, a list of strings
+        describing [events section](/reference/events) to annotate in the video.
+        If the request is successful, Scale will return the generated task
+        object, at which point you should store the `task_id` to have a
+        permanent reference to the task.
+      display-name: General Video Annotation
+      request: VideoPlaybackAnnotationRequest
+      response: VideoPlaybackAnnotationResponse
+
+types:
+  VideoPlaybackAnnotationRequest:
+    properties:
+      project:
+        docs: >-
+          The name of the [project](/reference/project-overview) to associate
+          this task with.
+        type: optional<string>
+      batch:
+        docs: >-
+          The name of the [batch](/reference/batch-overview) to associate this
+          task with. Note that if a batch is specified, you need not specify the
+          project, as the task will automatically be associated with the batch's
+          project. For Scale Rapid projects specifying a batch is required. See
+          [Batches section](/reference/batch-overview) for more details.
+        type: optional<string>
+      instruction:
+        docs: >-
+          A markdown-enabled string or iframe embed google doc explaining how to
+          do the task. You can use
+          [markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+          to show example images, give structure to your instructions, and more.
+          See our [instruction best
+          practices](https://scale.com/docs/instructions) for more details. For
+          Scale Rapid projects, DO NOT set this field unless you specifically
+          want to override the project level instructions.
+        type: optional<string>
+      callback_url:
+        docs: >-
+          The full url (including the scheme `http://` or `https://`) or email
+          address of the [callback](/reference/callbacks) that will be used when
+          the task is completed.
+        type: optional<string>
+      attachments:
+        docs: >-
+          An array of URLs for the frames you'd like to be annotated. These
+          image frames are stitched together to create a video. This is required
+          if `attachment_type` is `image` and must be omitted if
+          `attachment_type` is `video`.
+        type: optional<list<string>>
+      attachment:
+        docs: >-
+          A URL pointing to the video file attachment. Only the `mp4`, `webm`,
+          and `ogg` formats are supported.
+        type: optional<string>
+      attachment_type:
+        docs: >-
+          Describes what type of file the attachment(s) are. The only options
+          are `image` and `video`.
+        type: optional<string>
+      geometries:
+        docs: >-
+          An object mapping `box`, `polygon`, `line`, `point`, `cuboid`, or
+          `ellipse` to Geometry objects
+        type: Geometries
+      annotation_attributes:
+        docs: >-
+          See the [Annotation Attributes](/reference/attributes-overview)
+          section for more details about annotation attributes.
+        type: optional<map<string, AnnotationAttribute>>
+      events_to_annotate:
+        docs: The list of events to annotate
+        type: optional<list<string>>
+      links:
+        docs: >-
+          Use this field to define links between annotations. See
+          [Links](/reference/links) for more details about links.
+        type: optional<map<string, Links>>
+      frame_rate:
+        docs: The number of frames per second to annotate.
+        type: optional<integer>
+      padding:
+        docs: >-
+          The amount of padding in pixels added to the top, bottom, left, and
+          right of each video frame. This allows labelers to extend annotations
+          outside of the frames.
+        type: optional<integer>
+      paddingX:
+        docs: >-
+          The amount of padding in pixels added to the left and right of each
+          video frame. Overrides `padding` if set.
+        type: optional<integer>
+      paddingY:
+        docs: >-
+          The amount of padding in pixels added to the top and bottom of each
+          video frame. Overrides `padding` if set.
+        type: optional<integer>
+      hypothesis:
+        docs: >-
+          Editable annotations that a task should be initialized with. This is
+          useful when you've run a model to prelabel the task and want
+          annotators to refine those prelabels. Review the [Segmentation
+          Hypothesis Format](/reference/image-segmentation-hypothesis) for more
+          details.
+        type: optional<map<string, unknown>>
+      base_annotations:
+        docs: >-
+          Editable annotations, with the option to be "locked", that a task
+          should be initialized with. This is useful when you've run a model to
+          prelabel the task and want annotators to refine those prelabels. Must
+          contain the `annotations` field, which has the same format as the
+          `annotations` field in the response.
+        type: optional<map<string, unknown>>
+      can_add_base_annotations:
+        docs: >-
+          Whether or not new annotations can be added to the task if
+          base_annotations are used. If set to true, new annotations can be
+          added to the task in addition to base_annotations. If set to false,
+          new annotations will not be able to be added to the task.
+        type: optional<boolean>
+      can_edit_base_annotations:
+        docs: >-
+          Whether or not base_annotations can be edited in the task. If set to
+          true, base_annotations can be edited by the tasker (position of
+          annotation, attributes, etc). If set to false, all aspects of
+          base_annotations will be locked.
+        type: optional<boolean>
+      can_edit_base_annotation_labels:
+        docs: >-
+          Whether or not base_annotations labels can be edited in the task. If
+          set to true, the label of base_annotations can be edited by the
+          tasker. If set to false, the label will be locked.
+        type: optional<boolean>
+      can_delete_base_annotations:
+        docs: >-
+          Whether or not base_annotations can be removed from the task. If set
+          to true, base_annotations can be deleted from the task. If set to
+          false, base_annotations cannot be deleted from the task.
+        type: optional<boolean>
+      metadata:
+        docs: >-
+          A set of key/value pairs that you can attach to a task object. It can
+          be useful for storing additional information about the task in a
+          structured format. Max 10KB.
+        type: optional<map<string, unknown>>
+      priority:
+        docs: >-
+          A value of 10, 20, or 30 that defines the priority of a task within a
+          project. The higher the number, the higher the priority.
+        type: optional<integer>
+      unique_id:
+        docs: >-
+          A arbitrary ID that you can assign to a task and then query for later.
+          This ID must be unique across all projects under your account,
+          otherwise the task submission will be rejected. See [Avoiding
+          Duplicate Tasks](/reference/idempotent-requests) for more details.
+        type: optional<string>
+      clear_unique_id_on_error:
+        docs: >-
+          If set to be true, if a task errors out after being submitted, the
+          unique id on the task will be unset. This param allows workflows where
+          you can re-submit the same unique id to recover from errors
+          automatically
+        type: optional<boolean>
+      tags:
+        docs: >-
+          Arbitrary labels that you can assign to a task. At most 5 tags are
+          allowed per task. You can query tasks with specific tags through the
+          task retrieval API.
+        type: optional<list<string>>
+
+  Box:
+    properties:
+      objects_to_annotate: optional<list<unknown>>
+      min_height: optional<integer>
+      min_width: optional<integer>
+
+  Polygon:
+    properties:
+      objects_to_annotate: optional<list<unknown>>
+      min_vertices: optional<integer>
+      max_vertices: optional<integer>
+
+  Line:
+    properties:
+      objects_to_annotate: optional<list<unknown>>
+      min_vertices: optional<integer>
+      max_vertices: optional<integer>
+
+  Point:
+    properties:
+      objects_to_annotate: optional<list<unknown>>
+      x: optional<integer>
+      "y": optional<integer>
+
+  CameraIntrinsics:
+    properties:
+      fx: optional<integer>
+      fy: optional<integer>
+      cx: optional<integer>
+      cy: optional<integer>
+      skew: optional<integer>
+      scalefactor: optional<integer>
+
+  CameraRotationQuaternion:
+    properties:
+      w: optional<integer>
+      x: optional<integer>
+      "y": optional<integer>
+      z: optional<integer>
+
+  Cuboid:
+    properties:
+      objects_to_annotate: optional<list<unknown>>
+      min_height: optional<integer>
+      min_width: optional<integer>
+      camera_intrinsics: optional<CameraIntrinsics>
+      camera_rotation_quaternion: optional<CameraRotationQuaternion>
+      camera_height: optional<integer>
+
+  Ellipse:
+    properties:
+      objects_to_annotate: optional<list<unknown>>
+      vertices: optional<list<unknown>>
+
+  Geometries:
+    docs: >-
+      An object mapping `box`, `polygon`, `line`, `point`, `cuboid`, or
+      `ellipse` to Geometry objects
+    properties:
+      box: optional<Box>
+      polygon: optional<Polygon>
+      line: optional<Line>
+      point: optional<Point>
+      cuboid: optional<Cuboid>
+      ellipse: optional<Ellipse>
+
+  AnnotationAttribute:
+    properties:
+      type:
+        docs: "attribute types: category, number, angle, text, x_line, y_line, linked"
+        type: optional<string>
+      description:
+        docs: a human-readable string describing the attribute to a labeler.
+        type: optional<string>
+      choices:
+        docs: a list of strings corresponding to the categorical choices.
+        type: optional<string>
+
+  Links:
+    properties:
+      is_bidirectional:
+        docs: Whether or not the link is directional
+        type: optional<boolean>
+      from_allowed_labels:
+        docs: a list of labels of the geometries that the link can be linked from
+        type: optional<list<unknown>>
+      to_allowed_labels:
+        docs: a list of labels of the geometries that the link can be linked to
+        type: optional<list<unknown>>
+
+  VideoPlaybackAnnotationResponse:
+    properties:
+      task_id:
+        docs: The ID of the created task.
+        type: optional<string>
+      created_at:
+        docs: The time the task was created at (in YYYY-MM-DDThh:mm:ss.sTZD format).
+        type: optional<string>
+      type:
+        docs: The task type of the created task.
+        type: optional<string>
+      status:
+        docs: >-
+          The status of the task, either `pending`, `completed`, `canceled` or
+          `error`.
+        type: optional<string>
+      instruction:
+        docs: The instruction specified in the request.
+        type: optional<string>
+      is_test:
+        docs: Whether the task is a test task.
+        type: optional<boolean>
+      urgency: optional<string>
+      metadata:
+        docs: The metadata specified in the request.
+        type: optional<map<string, unknown>>
+      project:
+        docs: >-
+          The [project](/reference/project-overview) that this task is created
+          in.
+        type: optional<string>
+      callback_url:
+        docs: >-
+          The full url (including the scheme `http://` or `https://`) or email
+          address of the [callback](/reference/callbacks) that will be used when
+          the task is completed.
+        type: optional<string>
+      updated_at: optional<string>
+      work_started: optional<boolean>
+      params: optional<VideoPlaybackParams>
+
+  ObjectsToAnnotate:
+    properties:
+      objects_to_annotate: optional<list<unknown>>
+
+  VideoPlaybackGeometries:
+    properties:
+      box: optional<ObjectsToAnnotate>
+
+  VideoPlaybackParams:
+    properties:
+      attachment: optional<string>
+      frame_rate: optional<integer>
+      with_labels: optional<boolean>
+      events_to_annotate: optional<list<unknown>>
+      geometries: optional<VideoPlaybackGeometries>
+      is_test: optional<boolean>
+      metadata:
+        docs: >-
+          A set of key/value pairs that you can attach to a task object. It can
+          be useful for storing additional information about the task in a
+          structured format. Max 10KB.
+        type: optional<string>

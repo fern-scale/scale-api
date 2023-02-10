@@ -1,0 +1,1176 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Scale Video",
+    "description": "Readme API spec doc: Scale Video",
+    "termsOfService": "#"
+  },
+  "servers": [
+    {
+      "url": "https://api.scale.com/v1"
+    }
+  ],
+  "security": [{ "basicAuth": [] }],
+  "paths": {
+    "/task/videoannotation": {
+      "post": {
+        "description": "### **Note: Scale Video is only available for our Enterprise customers**. If you want to learn more, please contact our [sales team](https://scale.com/sales).\n\nThis endpoint creates a `videoannotation` task. Given a series of images sampled from a video (which we will refer to as \"frames\"), Scale will annotate each frame with the Geometries (`box`, `polygon`, `line`, `point`, `cuboid,` and `ellipse`) you specify.\n\nThe required parameter for this task is `geometries`.\n\nYou can optionally provide additional markdown-enabled or Google Doc-based [instructions](https://scale.com/docs/instructions) via the `instruction` parameter.\n\nYou may also optionally specify `events_to_annotate`, a list of strings describing [events section](/reference/events) to annotate in the video.\n\nIf the request is successful, Scale will return the generated task object, at which point you should store the `task_id` to have a permanent reference to the task.",
+        "tags": ["General Video Annotation"],
+        "summary": "General Video Annotation",
+        "operationId": "general-video-annotation",
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/videoannotation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resvideoannotation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request -- The request was unacceptable, often due to missing a required parameter."
+          },
+          "401": {
+            "description": "Unauthorized -- No valid API key provided."
+          },
+          "402": {
+            "description": "Not enabled -- Please contact sales@scaleapi.com before creating this type of task."
+          },
+          "404": {
+            "description": "Not Found -- The requested resource doesn't exist."
+          },
+          "409": {
+            "description": "Conflict -- The provided idempotency key is already in use for a different request."
+          },
+          "429": {
+            "description": "Too Many Requests -- Too many requests hit the API too quickly."
+          },
+          "500": {
+            "description": "Internal Server Error -- We had a problem with our server. Try again later."
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/task/videoplaybackannotation": {
+      "post": {
+        "description": "This endpoint creates a `videoplaybackannotation` task. In this task, we will view the given video file and draw annotation around the specified objects.\n\nYou are required to provide a URL to the video file as the `attachment`. It can be in `mp4`, `webm`, or `ogg` format.\n\nYou can optionally provide additional markdown-enabled or Google Doc-based [instructions](https://scale.com/docs/instructions) via the `instruction` parameter.\n\nYou may optionally specify a `frame_rate`, which will determine how many frames per second will be used to annotate the given video. The default value is `1`.\n\nYou may also optionally specify `events_to_annotate`, a list of strings describing [events section](/reference/events) to annotate in the video.\n\nIf the request is successful, Scale will return the generated task object, at which point you should store the `task_id` to have a permanent reference to the task.",
+        "tags": ["Video Playback"],
+        "summary": "Video Playback",
+        "operationId": "video-playback",
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/videoplaybackannotation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK -- Everything worked as expected.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resvideoplaybackannotation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request -- The request was unacceptable, often due to missing a required parameter."
+          },
+          "401": {
+            "description": "Unauthorized -- No valid API key provided."
+          },
+          "402": {
+            "description": "Not enabled -- Please contact sales@scaleapi.com before creating this type of task."
+          },
+          "404": {
+            "description": "Not Found -- The requested resource doesn't exist."
+          },
+          "409": {
+            "description": "Conflict -- The provided idempotency key is already in use for a different request."
+          },
+          "429": {
+            "description": "Too Many Requests -- Too many requests hit the API too quickly."
+          },
+          "500": {
+            "description": "Internal Server Error -- We had a problem with our server. Try again later."
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "videoannotation": {
+        "type": "object",
+        "required": ["geometries"],
+        "properties": {
+          "project": {
+            "type": "string",
+            "description": "The name of the [project](/reference/project-overview) to associate this task with."
+          },
+          "batch": {
+            "type": "string",
+            "description": "The name of the [batch](/reference/batch-overview) to associate this task with. Note that if a batch is specified, you need not specify the project, as the task will automatically be associated with the batch's project. For Scale Rapid projects specifying a batch is required. See [Batches section](/reference/batch-overview) for more details."
+          },
+          "instruction": {
+            "type": "string",
+            "description": "A markdown-enabled string or iframe embeded Google Doc explaining how to do the task. You can use [markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) to show example images, give structure to your instructions, and more. See our [instruction best practices](https://scale.com/docs/instructions) for more details. For Scale Rapid projects, DO NOT set this field unless you specifically want to override the project level instructions. ",
+            "default": "**Instructions:** Please label all the things"
+          },
+          "callback_url": {
+            "type": "string",
+            "description": "The full url (including the scheme `http://` or `https://`) or email address of the [callback](/reference/callbacks) that will be used when the task is completed."
+          },
+          "attachments": {
+            "type": "array",
+            "description": "An array of URLs of the video frames you'd like to be annotated. This is required if `attachment_type` is `image` and must be omitted if `attachment_type` is `video`.",
+            "default": [
+              "https://static.scale.com/scaleapi-lidar-images/2011_09_29_drive_0071_sync/image_02/data/0000000005.png",
+              "https://static.scale.com/scaleapi-lidar-images/2011_09_29_drive_0071_sync/image_02/data/0000000008.png"
+            ],
+            "items": { "type": "string" }
+          },
+          "attachment": {
+            "type": "string",
+            "description": "URL of the video file you'd like to be annotated. All the [video formats that can be decoded by FFMPEG](https://www.ffmpeg.org/general.html#Video-Codecs) are supported. This is required if `attachment_type` is `video` and must be omitted if `attachment_type` is `image`."
+          },
+          "attachment_type": {
+            "type": "string",
+            "description": "Describes what type of file the attachment(s) are. The only options are `image` and `video`.",
+            "default": "image"
+          },
+          "geometries": {
+            "type": "object",
+            "description": "This object is used to define which objects need to be annotated and which annotation geometries (`box`, `polygon`, `line`, `point`, `cuboid`, or `ellipse`) should be used for each annotation. Further description of each geometry can be found in each respective section below",
+            "properties": {
+              "box": {
+                "type": "object",
+                "description": "See the [Boxes](/reference/boxes) section for details on the parameter and response fields",
+                "properties": {
+                  "objects_to_annotate": {
+                    "type": "array",
+                    "xml": {
+                      "name": "objects_to_annotate",
+                      "wrapped": true
+                    },
+                    "items": {
+                      "default": "car"
+                    }
+                  },
+                  "min_height": {
+                    "type": "integer",
+                    "default": " "
+                  },
+                  "min_width": {
+                    "type": "integer",
+                    "default": " "
+                  },
+                  "can_rotate": {
+                    "type": "boolean",
+                    "default": " "
+                  },
+                  "integer_pixels": {
+                    "type": "boolean",
+                    "default": " "
+                  }
+                }
+              },
+              "polygon": {
+                "type": "object",
+                "description": "See the [Polygons](/reference/polygons) section for details on the parameter and response fields",
+                "properties": {
+                  "objects_to_annotate": {
+                    "type": "array",
+                    "xml": {
+                      "name": "objects_to_annotate",
+                      "wrapped": true
+                    },
+                    "items": {
+                      "default": "large vehicle"
+                    }
+                  },
+                  "min_vertices": {
+                    "type": "integer",
+                    "default": " "
+                  },
+                  "max_vertices": {
+                    "type": "integer",
+                    "default": " "
+                  }
+                }
+              },
+              "line": {
+                "type": "object",
+                "description": "See the [Lines](/reference/lines) section for details on the parameter and response fields",
+                "properties": {
+                  "objects_to_annotate": {
+                    "type": "array",
+                    "xml": {
+                      "name": "objects_to_annotate",
+                      "wrapped": true
+                    },
+                    "items": {
+                      "default": "large vehicle"
+                    }
+                  },
+                  "min_vertices": {
+                    "type": "integer",
+                    "default": " "
+                  },
+                  "max_vertices": {
+                    "type": "integer",
+                    "default": " "
+                  }
+                }
+              },
+              "point": {
+                "type": "object",
+                "description": "See the [Points](/reference/points) section for details on the parameter and response fields",
+                "properties": {
+                  "objects_to_annotate": {
+                    "type": "array",
+                    "xml": {
+                      "name": "objects_to_annotate",
+                      "wrapped": true
+                    },
+                    "items": {
+                      "default": "large vehicle"
+                    }
+                  }
+                }
+              },
+              "cuboid": {
+                "type": "object",
+                "description": "See the [Cuboids](/reference/cuboids) section for details on the parameter and response fields",
+                "properties": {
+                  "objects_to_annotate": {
+                    "type": "array",
+                    "xml": {
+                      "name": "objects_to_annotate",
+                      "wrapped": true
+                    },
+                    "items": {
+                      "default": "large vehicle"
+                    }
+                  },
+                  "min_height": {
+                    "type": "integer",
+                    "default": " "
+                  },
+                  "min_width": {
+                    "type": "integer",
+                    "default": " "
+                  },
+                  "camera_intrinsics": {
+                    "type": "object",
+                    "properties": {
+                      "fx": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "fy": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "cx": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "cy": {
+                        "type": "integer",
+                        "default": " ",
+                        "description": ""
+                      },
+                      "skew": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "scalefactor": {
+                        "type": "integer",
+                        "default": " "
+                      }
+                    }
+                  },
+                  "camera_rotation_quaternion": {
+                    "type": "object",
+                    "properties": {
+                      "w": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "x": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "y": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "z": {
+                        "type": "integer",
+                        "default": " "
+                      }
+                    }
+                  },
+                  "camera_height": {
+                    "type": "integer",
+                    "default": " "
+                  }
+                }
+              },
+              "ellipse": {
+                "type": "object",
+                "description": "See the [Ellipse](/reference/ellipses) section for details on the parameter and response fields",
+                "properties": {
+                  "objects_to_annotate": {
+                    "type": "array",
+                    "xml": {
+                      "name": "objects_to_annotate",
+                      "wrapped": true
+                    },
+                    "items": {
+                      "default": "large vehicle"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "annotation_attributes": {
+            "type": "object",
+            "description": "This field is used to add additional attributes that you would like to capture per annotation. See [Annotation Attributes](/reference/attributes-overview) for more details about annotation attributes.",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "description": "Attribute types: category, number, angle, text, x_line, y_line, linked.",
+                  "type": "string",
+                  "default": "category"
+                },
+                "description": {
+                  "description": "A human-readable string describing the attribute to a labeler.",
+                  "type": "string"
+                },
+                "choices": {
+                  "description": "A list of strings corresponding to the categorical choices.",
+                  "type": "string"
+                },
+                "conditions": {
+                  "description": "(optional): a JSON that describes the conditions under which this attribute should be collected.",
+                  "type": "object",
+                  "properties": {
+                    "label_condition": {
+                      "type": "array",
+                      "description": "Label or labels that you want to collect this attribute for",
+                      "xml": {
+                        "name": "label_condition",
+                        "wrapped": true
+                      },
+                      "items": {
+                        "default": "car"
+                      }
+                    },
+                    "attribute_conditions": {
+                      "description": "Under what conditions with the other attributes you'd like to collect this attribute",
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "events_to_annotate": {
+            "type": "array",
+            "description": "The list of events to annotate.",
+            "default": ["event_1_name"],
+            "items": { "type": "string" }
+          },
+          "duration_time": {
+            "type": "integer",
+            "description": "The duration of the video in seconds. This is ignored if `attachment_type` is `image`. Default is full video length",
+            "format": "int32"
+          },
+          "frame_rate": {
+            "type": "integer",
+            "description": "The number of frames to capture in one second. This is ignored if `attachment_type` is image.",
+            "default": 1,
+            "format": "int32"
+          },
+          "start_time": {
+            "type": "integer",
+            "description": "The start time in seconds. This is ignored if `attachment_type` is `image`.",
+            "default": 0,
+            "format": "int32"
+          },
+          "padding": {
+            "type": "integer",
+            "description": "The amount of padding in pixels added to the top, bottom, left, and right of each video frame. This allows labelers to extend annotations outside of the frames.",
+            "default": 0,
+            "format": "int32"
+          },
+          "paddingX": {
+            "type": "integer",
+            "description": "The amount of padding in pixels added to the left and right of each video frame. Overrides `padding` if set.",
+            "default": 0,
+            "format": "int32"
+          },
+          "paddingY": {
+            "type": "integer",
+            "description": "The amount of padding in pixels added to the top and bottom of each video frame. Overrides `padding` if set.",
+            "format": "int32"
+          },
+          "hypothesis": {
+            "type": "object",
+            "description": "Annotations that a task should be initialized with. This is useful when you've run a model to prelabel the task and want annotators to refine those prelabels. Must contain the `annotations.url` field, whose value is a Scale accesible file with the same format as the `annotations file` in the **response**.",
+            "properties": {}
+          },
+          "base_annotations": {
+            "type": "object",
+            "description": "Editable annotations, with the option to be \"locked\", that a task should be initialized with. This is useful when you've run a model to prelabel the task and want annotators to refine those prelabels. Must contain the `annotations` field, which has the same format as the `annotations` field in the response."
+          },
+          "can_add_base_annotations": {
+            "type": "boolean",
+            "description": "Whether or not new annotations can be added to the task if base_annotations are used. If set to true, new annotations can be added to the task in addition to base_annotations. If set to false, new annotations will not be able to be added to the task."
+          },
+          "can_edit_base_annotations": {
+            "type": "boolean",
+            "description": "Whether or not base_annotations can be edited in the task. If set to true, base_annotations can be edited by the tasker (position of annotation, attributes, etc). If set to false, all aspects of base_annotations will be locked."
+          },
+          "can_edit_base_annotation_labels": {
+            "type": "boolean",
+            "description": "Whether or not base_annotations labels can be edited in the task. If set to true, the label of base_annotations can be edited by the tasker. If set to false, the label will be locked."
+          },
+          "can_delete_base_annotations": {
+            "type": "boolean",
+            "description": "Whether or not base_annotations can be removed from the task. If set to true, base_annotations can be deleted from the task. If set to false, base_annotations cannot be deleted from the task."
+          },
+          "metadata": {
+            "type": "object",
+            "description": "A set of key/value pairs that you can attach to a task object. It can be useful for storing additional information about the task in a structured format. Max 10KB.",
+            "format": "json"
+          },
+          "priority": {
+            "type": "integer",
+            "description": "A value of 10, 20, or 30 that defines the priority of a task within a project. The higher the number, the higher the priority.",
+            "default": 30,
+            "format": "int32"
+          },
+          "unique_id": {
+            "type": "string",
+            "description": "A arbitrary ID that you can assign to a task and then query for later. This ID must be unique across all projects under your account, otherwise the task submission will be rejected. See [Avoiding Duplicate Tasks](/reference/idempotent-requests) for more details."
+          },
+          "clear_unique_id_on_error": {
+            "type": "boolean",
+            "description": "If set to be true, if a task errors out after being submitted, the unique id on the task will be unset. This param allows workflows where you can re-submit the same unique id to recover from errors automatically"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Arbitrary labels that you can assign to a task. At most 5 tags are allowed per task. You can query tasks with specific tags through the task retrieval API.",
+            "xml": { "name": "tags" },
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "resvideoannotation": {
+        "type": "object",
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "description": "The ID of the created task."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "The time the task was created at (in YYYY-MM-DDThh:mm:ss.sTZD format)."
+          },
+          "type": {
+            "type": "string",
+            "description": "The task type of the created task.",
+            "default": "videoannotation"
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the task, either `pending`, `completed`, `canceled` or `error`.",
+            "default": "pending"
+          },
+          "instruction": {
+            "type": "string",
+            "description": "The instruction specified in the request."
+          },
+          "is_test": {
+            "type": "boolean",
+            "description": "Whether the task is a test task.",
+            "default": false
+          },
+          "urgency": {
+            "type": "string",
+            "default": "standard"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "The metadata specified in the request.",
+            "format": "json"
+          },
+          "project": {
+            "type": "string",
+            "description": "The [project](/reference/project-overview) that this task is created in."
+          },
+          "callback_url": {
+            "type": "string",
+            "description": "The full url (including the scheme `http://` or `https://`) or email address of the [callback](/reference/callbacks) that will be used when the task is completed."
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "work_started": {
+            "type": "boolean",
+            "default": false
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "attachment_type": {
+                "type": "string",
+                "default": "website"
+              },
+              "attachment": {
+                "type": "array",
+                "xml": {
+                  "name": "Data",
+                  "wrapped": true
+                },
+                "items": {
+                  "default": "https://static.scale.com/scaleapi-lidar-images/2011_09_26_drive_0051_sync/image_02/data/0000000000.png"
+                }
+              },
+              "geometries": {
+                "type": "object",
+                "properties": {
+                  "box": {
+                    "type": "object",
+                    "properties": {
+                      "objects_to_annotate": {
+                        "type": "array",
+                        "xml": {
+                          "name": "objects_to_annotate",
+                          "wrapped": true
+                        },
+                        "items": {
+                          "default": "large vehicle"
+                        }
+                      },
+                      "min_height": {
+                        "type": "integer",
+                        "default": 10
+                      },
+                      "min_width": {
+                        "type": "integer",
+                        "default": 10
+                      }
+                    }
+                  },
+                  "polygon": {
+                    "type": "object",
+                    "properties": {
+                      "objects_to_annotate": {
+                        "type": "array",
+                        "xml": {
+                          "name": "objects_to_annotate",
+                          "wrapped": true
+                        },
+                        "items": {
+                          "default": "pedestrian"
+                        }
+                      }
+                    }
+                  },
+                  "point": {
+                    "type": "object",
+                    "properties": {
+                      "objects_to_annotate": {
+                        "type": "array",
+                        "xml": {
+                          "name": "objects_to_annotate",
+                          "wrapped": true
+                        },
+                        "items": {
+                          "default": "top of road sign, top of traffic light"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "annotation_attributes": {
+                "type": "object",
+                "description": "See the [Annotation Attributes](/reference/attributes-overview) section for more details about annotation attributes.",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string"
+                    },
+                    "choice": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "events_to_annotate": {
+                "type": "array",
+                "xml": {
+                  "name": "objects_to_annotate",
+                  "wrapped": true
+                },
+                "items": {
+                  "default": "Lane change"
+                }
+              },
+              "with_labels": {
+                "type": "boolean",
+                "default": true
+              }
+            }
+          }
+        }
+      },
+      "videoplaybackannotation": {
+        "type": "object",
+        "required": ["geometries"],
+        "properties": {
+          "project": {
+            "type": "string",
+            "description": "The name of the [project](/reference/project-overview) to associate this task with."
+          },
+          "batch": {
+            "type": "string",
+            "description": "The name of the [batch](/reference/batch-overview) to associate this task with. Note that if a batch is specified, you need not specify the project, as the task will automatically be associated with the batch's project. For Scale Rapid projects specifying a batch is required. See [Batches section](/reference/batch-overview) for more details."
+          },
+          "instruction": {
+            "type": "string",
+            "description": "A markdown-enabled string or iframe embed google doc explaining how to do the task. You can use [markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) to show example images, give structure to your instructions, and more. See our [instruction best practices](https://scale.com/docs/instructions) for more details. For Scale Rapid projects, DO NOT set this field unless you specifically want to override the project level instructions. ",
+            "default": "**Instructions:** Please label all the things"
+          },
+          "callback_url": {
+            "type": "string",
+            "description": "The full url (including the scheme `http://` or `https://`) or email address of the [callback](/reference/callbacks) that will be used when the task is completed."
+          },
+          "attachments": {
+            "type": "array",
+            "description": "An array of URLs for the frames you'd like to be annotated. These image frames are stitched together to create a video. This is required if `attachment_type` is `image` and must be omitted if `attachment_type` is `video`.",
+            "default": [
+              "https://static.scale.com/scaleapi-lidar-images/2011_09_26_drive_0051_sync/image_02/data/0000000000.png",
+              "https://static.scale.com/scaleapi-lidar-images/2011_09_26_drive_0051_sync/image_02/data/0000000001.png"
+            ],
+            "items": { "type": "string" }
+          },
+          "attachment": {
+            "type": "string",
+            "description": "A URL pointing to the video file attachment. Only the `mp4`, `webm`, and `ogg` formats are supported.",
+            "default": "https://scale-static-assets.s3-us-west-2.amazonaws.com/demos/multimodal-video.mp4"
+          },
+          "attachment_type": {
+            "type": "string",
+            "description": "Describes what type of file the attachment(s) are. The only options are `image` and `video`.",
+            "default": "image"
+          },
+          "geometries": {
+            "type": "object",
+            "description": "An object mapping `box`, `polygon`, `line`, `point`, `cuboid`, or `ellipse` to Geometry objects",
+            "properties": {
+              "box": {
+                "type": "object",
+                "properties": {
+                  "objects_to_annotate": {
+                    "type": "array",
+                    "xml": {
+                      "name": "objects_to_annotate",
+                      "wrapped": true
+                    },
+                    "items": {
+                      "default": "large vehicle"
+                    }
+                  },
+                  "min_height": {
+                    "type": "integer",
+                    "default": 10
+                  },
+                  "min_width": {
+                    "type": "integer",
+                    "default": 10
+                  }
+                }
+              },
+              "polygon": {
+                "type": "object",
+                "properties": {
+                  "objects_to_annotate": {
+                    "type": "array",
+                    "xml": {
+                      "name": "objects_to_annotate",
+                      "wrapped": true
+                    },
+                    "items": {
+                      "default": "large vehicle"
+                    }
+                  },
+                  "min_vertices": {
+                    "type": "integer",
+                    "default": 1
+                  },
+                  "max_vertices": {
+                    "type": "integer",
+                    "default": " "
+                  }
+                }
+              },
+              "line": {
+                "type": "object",
+                "properties": {
+                  "objects_to_annotate": {
+                    "type": "array",
+                    "xml": {
+                      "name": "objects_to_annotate",
+                      "wrapped": true
+                    },
+                    "items": {
+                      "default": "large vehicle"
+                    }
+                  },
+                  "min_vertices": {
+                    "type": "integer",
+                    "default": 1
+                  },
+                  "max_vertices": {
+                    "type": "integer",
+                    "default": " "
+                  }
+                }
+              },
+              "point": {
+                "type": "object",
+                "properties": {
+                  "objects_to_annotate": {
+                    "type": "array",
+                    "xml": {
+                      "name": "objects_to_annotate",
+                      "wrapped": true
+                    },
+                    "items": {
+                      "default": "large vehicle"
+                    }
+                  },
+                  "x": {
+                    "type": "integer",
+                    "default": " "
+                  },
+                  "y": {
+                    "type": "integer",
+                    "default": " "
+                  }
+                }
+              },
+              "cuboid": {
+                "type": "object",
+                "properties": {
+                  "objects_to_annotate": {
+                    "type": "array",
+                    "xml": {
+                      "name": "objects_to_annotate",
+                      "wrapped": true
+                    },
+                    "items": {
+                      "default": "large vehicle"
+                    }
+                  },
+                  "min_height": {
+                    "type": "integer",
+                    "default": 0
+                  },
+                  "min_width": {
+                    "type": "integer",
+                    "default": 0
+                  },
+                  "camera_intrinsics": {
+                    "type": "object",
+                    "properties": {
+                      "fx": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "fy": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "cx": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "cy": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "skew": {
+                        "type": "integer",
+                        "default": 0
+                      },
+                      "scalefactor": {
+                        "type": "integer",
+                        "default": 1
+                      }
+                    }
+                  },
+                  "camera_rotation_quaternion": {
+                    "type": "object",
+                    "properties": {
+                      "w": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "x": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "y": {
+                        "type": "integer",
+                        "default": " "
+                      },
+                      "z": {
+                        "type": "integer",
+                        "default": " "
+                      }
+                    }
+                  },
+                  "camera_height": {
+                    "type": "integer",
+                    "default": " "
+                  }
+                }
+              },
+              "ellipse": {
+                "type": "object",
+                "properties": {
+                  "objects_to_annotate": {
+                    "type": "array",
+                    "xml": {
+                      "name": "objects_to_annotate",
+                      "wrapped": true
+                    },
+                    "items": {
+                      "default": "large vehicle"
+                    }
+                  },
+                  "vertices": {
+                    "type": "array",
+                    "xml": {
+                      "name": "objects_to_annotate",
+                      "wrapped": true
+                    },
+                    "items": {
+                      "default": "pedestrian"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "annotation_attributes": {
+            "type": "object",
+            "description": "See the [Annotation Attributes](/reference/attributes-overview) section for more details about annotation attributes.",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "description": "attribute types: category, number, angle, text, x_line, y_line, linked",
+                  "type": "string",
+                  "default": "category"
+                },
+                "description": {
+                  "description": "a human-readable string describing the attribute to a labeler.",
+                  "type": "string"
+                },
+                "choices": {
+                  "description": "a list of strings corresponding to the categorical choices.",
+                  "type": "string"
+                },
+                "conditions": {
+                  "description": "(optional): a JSON that describes the conditions under which this attribute should be collected.",
+                  "type": "object",
+                  "properties": {
+                    "label_condition": {
+                      "type": "array",
+                      "description": "Label or labels that you want to collect this attribute for",
+                      "xml": {
+                        "name": "label_condition",
+                        "wrapped": true
+                      },
+                      "items": {
+                        "default": "car"
+                      }
+                    },
+                    "attribute_conditions": {
+                      "description": "Under what conditions with the other attributes you'd like to collect this attribute",
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "events_to_annotate": {
+            "type": "array",
+            "description": "The list of events to annotate",
+            "default": [null],
+            "items": { "type": "string" }
+          },
+          "links": {
+            "type": "object",
+            "description": "Use this field to define links between annotations. See [Links](/reference/links) for more details about links.",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "is_bidirectional": {
+                  "description": "Whether or not the link is directional",
+                  "type": "boolean",
+                  "default": false
+                },
+                "from_allowed_labels": {
+                  "description": "a list of labels of the geometries that the link can be linked from",
+                  "type": "array",
+                  "default": ["merchandise"]
+                },
+                "to_allowed_labels": {
+                  "description": "a list of labels of the geometries that the link can be linked to",
+                  "type": "array",
+                  "default": ["priceTag"]
+                }
+              }
+            }
+          },
+          "frame_rate": {
+            "type": "integer",
+            "description": "The number of frames per second to annotate.",
+            "default": 1,
+            "format": "int32"
+          },
+          "padding": {
+            "type": "integer",
+            "description": "The amount of padding in pixels added to the top, bottom, left, and right of each video frame. This allows labelers to extend annotations outside of the frames.",
+            "default": 0,
+            "format": "int32"
+          },
+          "paddingX": {
+            "type": "integer",
+            "description": "The amount of padding in pixels added to the left and right of each video frame. Overrides `padding` if set.",
+            "default": 0,
+            "format": "int32"
+          },
+          "paddingY": {
+            "type": "integer",
+            "description": "The amount of padding in pixels added to the top and bottom of each video frame. Overrides `padding` if set.",
+            "default": 0,
+            "format": "int32"
+          },
+          "hypothesis": {
+            "type": "object",
+            "description": "Editable annotations that a task should be initialized with. This is useful when you've run a model to prelabel the task and want annotators to refine those prelabels. Review the [Segmentation Hypothesis Format](/reference/image-segmentation-hypothesis) for more details."
+          },
+          "base_annotations": {
+            "type": "object",
+            "description": "Editable annotations, with the option to be \"locked\", that a task should be initialized with. This is useful when you've run a model to prelabel the task and want annotators to refine those prelabels. Must contain the `annotations` field, which has the same format as the `annotations` field in the response."
+          },
+          "can_add_base_annotations": {
+            "type": "boolean",
+            "description": "Whether or not new annotations can be added to the task if base_annotations are used. If set to true, new annotations can be added to the task in addition to base_annotations. If set to false, new annotations will not be able to be added to the task."
+          },
+          "can_edit_base_annotations": {
+            "type": "boolean",
+            "description": "Whether or not base_annotations can be edited in the task. If set to true, base_annotations can be edited by the tasker (position of annotation, attributes, etc). If set to false, all aspects of base_annotations will be locked."
+          },
+          "can_edit_base_annotation_labels": {
+            "type": "boolean",
+            "description": "Whether or not base_annotations labels can be edited in the task. If set to true, the label of base_annotations can be edited by the tasker. If set to false, the label will be locked."
+          },
+          "can_delete_base_annotations": {
+            "type": "boolean",
+            "description": "Whether or not base_annotations can be removed from the task. If set to true, base_annotations can be deleted from the task. If set to false, base_annotations cannot be deleted from the task."
+          },
+          "metadata": {
+            "type": "object",
+            "description": "A set of key/value pairs that you can attach to a task object. It can be useful for storing additional information about the task in a structured format. Max 10KB.",
+            "format": "json"
+          },
+          "priority": {
+            "type": "integer",
+            "description": "A value of 10, 20, or 30 that defines the priority of a task within a project. The higher the number, the higher the priority.",
+            "default": 30,
+            "format": "int32"
+          },
+          "unique_id": {
+            "type": "string",
+            "description": "A arbitrary ID that you can assign to a task and then query for later. This ID must be unique across all projects under your account, otherwise the task submission will be rejected. See [Avoiding Duplicate Tasks](/reference/idempotent-requests) for more details."
+          },
+          "clear_unique_id_on_error": {
+            "type": "boolean",
+            "description": "If set to be true, if a task errors out after being submitted, the unique id on the task will be unset. This param allows workflows where you can re-submit the same unique id to recover from errors automatically"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Arbitrary labels that you can assign to a task. At most 5 tags are allowed per task. You can query tasks with specific tags through the task retrieval API.",
+            "xml": { "name": "tags" },
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "resvideoplaybackannotation": {
+        "type": "object",
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "description": "The ID of the created task."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "The time the task was created at (in YYYY-MM-DDThh:mm:ss.sTZD format)."
+          },
+          "type": {
+            "type": "string",
+            "description": "The task type of the created task.",
+            "default": "videoplaybackannotation"
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the task, either `pending`, `completed`, `canceled` or `error`.",
+            "default": "pending"
+          },
+          "instruction": {
+            "type": "string",
+            "description": "The instruction specified in the request."
+          },
+          "is_test": {
+            "type": "boolean",
+            "description": "Whether the task is a test task.",
+            "default": false
+          },
+          "urgency": {
+            "type": "string",
+            "default": "standard"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "The metadata specified in the request.",
+            "format": "json"
+          },
+          "project": {
+            "type": "string",
+            "description": "The [project](/reference/project-overview) that this task is created in."
+          },
+          "callback_url": {
+            "type": "string",
+            "description": "The full url (including the scheme `http://` or `https://`) or email address of the [callback](/reference/callbacks) that will be used when the task is completed."
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "work_started": {
+            "type": "boolean",
+            "default": false
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "attachment": {
+                "type": "string",
+                "default": "582bfe0ee5d51cda4e903f4a"
+              },
+              "frame_rate": {
+                "type": "integer",
+                "default": 5
+              },
+              "with_labels": {
+                "type": "boolean",
+                "default": true
+              },
+              "events_to_annotate": {
+                "type": "array",
+                "xml": {
+                  "name": "Data",
+                  "wrapped": true
+                },
+                "items": {
+                  "default": "Mentioned"
+                }
+              },
+              "geometries": {
+                "type": "object",
+                "properties": {
+                  "box": {
+                    "type": "object",
+                    "properties": {
+                      "objects_to_annotate": {
+                        "type": "array",
+                        "xml": {
+                          "name": "Data",
+                          "wrapped": true
+                        },
+                        "items": {
+                          "default": "Mentioned , Furniture, Decor"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "is_test": {
+                "type": "boolean",
+                "default": true
+              },
+              "metadata": {
+                "type": "string",
+                "description": "A set of key/value pairs that you can attach to a task object. It can be useful for storing additional information about the task in a structured format. Max 10KB.",
+                "format": "json"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

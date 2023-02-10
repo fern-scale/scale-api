@@ -1,0 +1,514 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Tasks",
+    "description": "Readme API spec doc: Tasks",
+    "termsOfService": "#"
+  },
+  "servers": [
+    {
+      "url": "https://api.scale.com/v1"
+    }
+  ],
+  "security": [{ "basicAuth": [] }],
+  "paths": {
+    "/task/{taskId}": {
+      "get": {
+        "description": "This API endpoint retrieves a specific task.",
+        "tags": ["Tasks Object Overview"],
+        "summary": "Retrieve a Task",
+        "operationId": "retrieve-tasks",
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "576ba74eec471ff9b01557cc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Request - Task body is returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskObject"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Task with that id does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status_code": {
+                      "type": "number",
+                      "example": 404,
+                      "default": 404
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Task with that ID not found.",
+                      "default": "Task with that ID not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/tasks": {
+      "get": {
+        "description": "This is a paginated endpoint that retrieves a list of your tasks.\n\nThe tasks will be returned in descending order based on `created_at` time. All time filters expect an [ISO 8601-formatted string](https://timestampgenerator.com/), like '2021-04-25' or '2021-04-25T03:14:15-07:00'\n\nThe pagination is based on the `limit` and `next_token` parameters, which determine the page size and the current page we are on. The value of `next_token` is a unique pagination token for each page ([nerdy details if you were curious](https://www.mixmax.com/engineering/api-paging-built-the-right-way/)). Make the call again using the returned token to retrieve the next page.",
+        "tags": ["Tasks Object Overview"],
+        "summary": "Retrieve Multiple tasks",
+        "parameters": [
+          {
+            "name": "start_time",
+            "description": "The minimum value of `created_at` for tasks to be returned",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_time",
+            "description": "The maximum value of `created_at` for tasks to be returned",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "completed_after",
+            "description": "The minimum value of `completed_at` for tasks to be returned",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "completed_before",
+            "description": "The maximum value of `completed_at` for tasks to be returned",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updated_after",
+            "description": "The minimum value of `updated_at` for tasks to be returned",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updated_before",
+            "description": "The maximum value of `updated_at` for tasks to be returned",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "description": "The status of the task - can be: `completed`, `pending`, or `canceled`",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "completed"
+            }
+          },
+          {
+            "name": "type",
+            "description": "The type of the task",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": "imageannotation",
+              "type": "string"
+            }
+          },
+          {
+            "name": "project",
+            "description": "The name of the project that the returned tasks must belong to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": "kitten_labeling",
+              "type": "string"
+            }
+          },
+          {
+            "name": "batch",
+            "description": "The name of the batch that the returned tasks must belong to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": "kitten_labeling_2020-07",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customer_review_status",
+            "description": "The status of the audit result of the task - can be: `accepted`, `fixed`, `commented`, or `rejected`; multiple status values can be specified at the same time either as a joint string separated by comma (e.g. `customer_review_status=accepted,fixed`), or as an array (e.g. `customer_review_status=accepted&customer_review_status=fixed`)",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["accepted"]
+            }
+          },
+          {
+            "name": "limit",
+            "description": "A number between 1 and 100, the maximum number of results to display per page | optional, default 100",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "unique_id",
+            "in": "query",
+            "description": "The unique_id of a task; multiple unique IDs can be specified at the same time either as a joint string separated by comma (e.g. `unique_id=a1,a2`), or as an array (e.g. `unique_id=a1&unique_id=a2`)",
+            "required": false,
+            "schema": { "type": "array", "items": { "type": "string" } }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "description": "The tags of a task; multiple tags can be specified at the same time either as a joint string separated by comma (e.g. `tags=t1,t2`), or as an array (e.g. `tags=t1&unique_id=t2`)",
+            "required": false,
+            "schema": { "type": "array", "items": { "type": "string" } }
+          },
+          {
+            "name": "include_attachment_url",
+            "in": "query",
+            "description": "Set to true if the returned Task Object should include presigned attachment urls.",
+            "required": false,
+            "schema": { "type": "boolean", "default": true }
+          },
+          {
+            "name": "next_token",
+            "description": "A token used to retrieve the next page of results if there are more.",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "list-multiple-tasks",
+        "responses": {
+          "200": {
+            "description": "Successful Request - List of Tasks returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrieveMultipletasks"
+                }
+              }
+            }
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/task/{taskId}/cancel": {
+      "post": {
+        "description": "This endpoint cancels a task so that it will not be completed.\n\nYou may only cancel pending tasks, and the endpoint will return a 400 error code if you attempt to cancel a completed task\n\nIf the task to be cancled had a unique id, specifying `clear_unique_id=true` will remove the unique id.  Canceling tasks is idempotent such that calling this endpoint multiple times will still return a 200 success response.",
+        "tags": ["Tasks Object Overview"],
+        "summary": "Cancel task",
+        "operationId": "cancel-task",
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "default": "576ba74eec471ff9b01557cc",
+              "type": "string"
+            }
+          },
+          {
+            "name": "clear_unique_id",
+            "description": "If `true`, will clear a task's `unique_id`, thus allowing the same unique id to be used in future tasks.",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "true"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The task body is returned, with a status equal to `canceled`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskObject"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - This task cannot be canceled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status_code": {
+                      "type": "number",
+                      "example": 400,
+                      "default": 400
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "The task has already been worked on and cannot be canceled through API. Please contact your Scale account manager.",
+                      "default": "The task has already been worked on and cannot be canceled through API. Please contact your Scale account manager."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/task/{taskId}/setMetadata": {
+      "post": {
+        "description": "This endpoint sets the `metadata` field on a task.\n\nYou may set the `metadata` field on any existing task using valid key-value data.\n\nUpdating a task's `metadata` field is idempotent such that calling this endpoint multiple times will still return a 200 success response.",
+        "tags": ["Tasks Object Overview"],
+        "summary": "Set task metadata",
+        "operationId": "set-metadata",
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "default": "576ba74eec471ff9b01557cc",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetadataObject"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The task body is returned, with `metadata` field set to new value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskObject"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status_code": {
+                      "type": "number",
+                      "example": 400,
+                      "default": 400
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Metadata needs to be a valid key-value pair",
+                      "default": "Metadata needs to be a valid key-value pair"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task with that ID not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status_code": {
+                      "type": "number",
+                      "example": 404,
+                      "default": 404
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Task with that ID not found.",
+                      "default": "Task with that ID not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "RetrieveMultipletasks": {
+        "type": "object",
+        "properties": {
+          "docs": {
+            "type": "array",
+            "xml": {
+              "name": "Data",
+              "wrapped": true
+            },
+            "items": {
+              "$ref": "#/components/schemas/TaskObject"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "default": 220,
+            "example": 220
+          },
+          "limit": {
+            "type": "integer",
+            "default": 100,
+            "example": 100
+          },
+          "has_more": {
+            "type": "boolean",
+            "default": true,
+            "example": true
+          },
+          "next_token": {
+            "type": "string",
+            "default": "eyJ0YXNrX2lkIjoiNjBkYjgwZTFkYmRkNTMwMDExNDZlMzg5IiwiY3JlYXRlZF9hdCI6IjIwMjEtMDYtMjlUMjA6MjE6NTMuMjg5WiJ9",
+            "example": "eyJ0YXNrX2lkIjoiNjBkYjgwZTFkYmRkNTMwMDExNDZlMzg5IiwiY3JlYXRlZF9hdCI6IjIwMjEtMDYtMjlUMjA6MjE6NTMuMjg5WiJ9"
+          }
+        }
+      },
+      "TaskObject": {
+        "type": "object",
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "default": "601ba74eec471ff9b01557cc",
+            "example": "601ba74eec471ff9b01557cc"
+          },
+          "created_at": {
+            "type": "string",
+            "default": "2021-06-23T09:09:34.752Z",
+            "example": "2021-06-23T09:09:34.752Z"
+          },
+          "callback_url": {
+            "type": "string",
+            "default": "http://www.example.com/callback",
+            "example": "http://www.example.com/callback"
+          },
+          "type": {
+            "type": "string",
+            "default": "imageannotation",
+            "example": "imageannotation"
+          },
+          "status": {
+            "type": "string",
+            "default": "canceled",
+            "example": "canceled"
+          },
+          "instruction": {
+            "type": "string",
+            "default": "Label every object in this image",
+            "example": "Label every object in this image"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "attachment": {
+                "type": "string",
+                "default": "https://example.com/image.jpg",
+                "example": "https://example.com/image.jpg"
+              },
+              "geometries": {
+                "type": "object",
+                "properties": {
+                  "box": {
+                    "type": "object",
+                    "properties": {
+                      "objects_to_annotate": {
+                        "type": "array",
+                        "default": ["vehicle", "pedestrian"],
+                        "example": ["vehicle", "pedestrian"],
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "A set of key/value pairs that you can attach to a task object. It can be useful for storing additional information about the task in a structured format. Max 10KB.",
+            "format": "json",
+            "example": {"key": "value", "key2": "value2"}
+          }
+        }
+      },
+      "MetadataObject": {
+        "type": "object",
+        "description": "A set of key/value pairs that you can attach to a task object. It can be useful for storing additional information about the task in a structured format. Max 10KB.",
+        "format": "json",
+        "example": {"key": "value", "key2": "value2"}
+      }
+    }
+  }
+}

@@ -1,0 +1,461 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Projects",
+    "description": "openapi spec doc: Project",
+    "termsOfService": "#"
+  },
+  "servers": [
+    {
+      "url": "https://api.scale.com/v1"
+    }
+  ],
+  "security": [{ "basicAuth": [] }],
+  "paths": {
+    "/projects": {
+      "post": {
+        "tags": ["Project  Overview"],
+        "summary": "Project Creation",
+        "description": "",
+        "operationId": "project-creation",
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SampleProject"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request -- The request was unacceptable, often due to missing a required parameter."
+          },
+          "401": {
+            "description": "Unauthorized -- No valid API key provided."
+          },
+          "402": {
+            "description": "Not enabled -- Please contact sales@scaleapi.com before creating this type of task."
+          },
+          "404": {
+            "description": "Not Found -- The requested resource doesn't exist."
+          },
+          "409": {
+            "description": "Conflict -- The provided idempotency key is already in use for a different request."
+          },
+          "429": {
+            "description": "Too Many Requests -- Too many requests hit the API too quickly."
+          },
+          "500": {
+            "description": "Internal Server Error -- We had a problem with our server. Try again later."
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      },
+      "get": {
+        "description": "List information for all projects. **Note:** No parameters required. Optionally, set a boolean value for `archived` to only list information for all (un)archived projects.",
+        "tags": ["Project  Overview"],
+        "summary": "List All Projects",
+        "operationId": "list-all-projects",
+        "parameters": [
+          {
+            "name": "archived",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "List information for only archived or only unarchived projects. If omitted, information for all projects will be listed."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "products",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resListAllProjects"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Response to a POST that results in a creation."
+          },
+          "204": {
+            "description": "Response to a successful request that won't be returning a body."
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          },
+          "501": {
+            "description": "Not Implemented (The method you have called has not been implemented)"
+          },
+          "503": {
+            "description": "Rate Limit Exceeded"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/projects/{Name}": {
+      "get": {
+        "description": "Retrieve information about a single project.",
+        "tags": ["Project  Overview"],
+        "summary": "Project Retrieval",
+        "operationId": "project-retrieval",
+        "parameters": [
+          {
+            "name": "Name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "kitten_labeling"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ActiveLocation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SampleProject"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Response to a POST that results in a creation."
+          },
+          "204": {
+            "description": "Response to a successful request that won't be returning a body."
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          },
+          "501": {
+            "description": "Not Implemented (The method you have called has not been implemented)"
+          },
+          "503": {
+            "description": "Rate Limit Exceeded"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/projects/{Name}/setParams": {
+      "post": {
+        "description": "You can set parameters on a project. Project-level-parameters will be set on future tasks created under this project if they are not set in the task request. Any parameters specified in the task request will override any project parameter.\n\nProjects keep a history of the parameters that they were set with. Tasks created under a project inherit the latest params of the project (the last entry in param_history), one can also specify project_version when creating a task to inherit from an older set of params (or use -1 to skip parameter inheritance altogether.)\n\nTasks have a `project_param_version` field pointing to the project version in place at the time a task was created.\n\nIf you haven't already, check out our [guide to using Project-level parameters](/reference/using-project-versioning) to learn more about how this workflow comes togeher.\n\nJust want to see some examples? [We've added those as well](/reference/examples-of-project-parameters).",
+        "tags": ["Project  Overview"],
+        "summary": "Update Parameters (Project)",
+        "operationId": "project-update-parameters",
+        "parameters": [
+          {
+            "name": "Name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "kitten_labeling"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateParameters"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ActiveLocation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SampleProject"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Response to a POST that results in a creation."
+          },
+          "204": {
+            "description": "Response to a successful request that won't be returning a body."
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          },
+          "501": {
+            "description": "Not Implemented (The method you have called has not been implemented)"
+          },
+          "503": {
+            "description": "Rate Limit Exceeded"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    },
+    "/projects/{Name}/setOntology": {
+      "post": {
+        "description": "You can set ontologies on a project. Ontologies will be referenced by the tasks of a project. Projects keep a history of the ontologies they were set with.\n\nThe ontology can be composed of a list of strings or [OntologyChoice](/reference/ontology-nesting-and-options) objects. Ontology choices and their subchoices must be unique throughout the ontology.",
+        "tags": ["Project  Overview"],
+        "summary": "Update Ontology (Project)",
+        "operationId": "project-update-ontology",
+        "parameters": [
+          {
+            "name": "Name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "kitten_labeling"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Body Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOntology"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request (A validation exception has occurred.)"
+          },
+          "401": {
+            "description": "Unauthorized (Invalid authorization credentials.)"
+          },
+          "403": {
+            "description": "When authentication succeeded but authenticated user doesn't have access to the resource"
+          },
+          "404": {
+            "description": "Not Found (The resource you have specified cannot be found)"
+          },
+          "500": {
+            "description": "Internal Error"
+          },
+          "501": {
+            "description": "Not Implemented (The method you have called has not been implemented)"
+          },
+          "503": {
+            "description": "Rate Limit Exceeded"
+          }
+        },
+        "x-readme": {
+          "samples-languages": ["python", "node", "javascript", "curl"]
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "ProjectCreation": {
+        "type": "object",
+        "required": ["type", "name"],
+        "properties": {
+          "type": {
+            "description": "The task type of all the tasks belonging to this project",
+            "type": "string",
+            "default": "imageannotation"
+          },
+          "name": {
+            "description": "Name identifying this project. Must be unique among all your projects. When creating tasks for this project, you should add a `project: <name>` parameter to the task creation request to associate the task with this project.",
+            "type": "string",
+            "default": "kitten_labeling"
+          },
+          "rapid": {
+            "description": "Whether the project being created is a Scale Rapid project. Enterprise and On-Demand customers should omit this value.",
+            "type": "boolean",
+            "default": false
+          },
+          "params": {
+            "description": "Default parameters for tasks created under this project. Any parameters specified here will be set if omitted in a task request; they will be overridden by any values sent in the task request. `params.instruction` behaves slightly differently; values here will instead be appended after the task-level instruction.",
+            "type": "object",
+            "properties": {
+              "instruction": {
+                "description": "Markdown or Google Doc iframe. For Scale Rapid projects you can always omit this field.",
+                "default": "Please label the kittens"
+              },
+              "<any>": {
+                "type": "object",
+                "description": "Default parameters for tasks created under this project. Any parameters specified here will be set if omitted in a task request; they will be overridden by any values sent in the task request."
+              }
+            }
+          }
+        }
+      },
+      "SampleProject": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "default": "imageannotation",
+            "example": "imageannotation"
+          },
+          "name": {
+            "type": "string",
+            "default": "kitten_labeling",
+            "example": "kitten_labeling"
+          },
+          "param_history": {
+            "type": "array",
+            "xml": {
+              "name": "Data",
+              "wrapped": true
+            },
+            "items": {
+              "$ref": "#/components/schemas/SampleProjectParamHistory"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "default": "2021-04-25T07:38:32.368Z",
+            "example": "2021-04-25T07:38:32.368Z"
+          }
+        }
+      },
+      "SampleProjectParamHistory": {
+        "type": "object",
+        "properties": {
+          "instruction": {
+            "type": "string",
+            "default": "please label the kittens in the image",
+            "example": "please label the kittens in the image"
+          },
+          "version": {
+            "type": "integer",
+            "default": 0,
+            "example": 0
+          },
+          "created_at": {
+            "type": "string",
+            "default": "2021-04-25T07:38:32.368Z",
+            "example": "2021-04-25T07:38:32.368Z"
+          }
+        }
+      },
+      "resListAllProjects": {
+        "type": "array",
+        "xml": {
+          "name": "Data",
+          "wrapped": true
+        },
+        "items": {
+          "$ref": "#/components/schemas/SampleProject"
+        }
+      },
+      "UpdateParameters": {
+        "type": "object",
+        "properties": {
+          "patch": {
+            "type": "boolean",
+            "description": "When generating the newest set of project parameters, whether or not to combine the most recent project parameters with the parameters specified in this request. Defaults to false. For example, if the current params contains { instruction: 'label the cats in the image' } and the latest call to this API contains the task parameter { objects_to_annotate: ['cat'] }, whether or not patch is additionally set will determine if the new project parameters also contain the instruction “label the cats in the image”. Note that any fields set in the API request completely override any fields from the previous version; object or array values will not be merged.",
+            "default": "false"
+          },
+          "instruction": {
+            "type": "string",
+            "description": "`instruction` field to combine with any specified task-level instruction."
+          },
+          "<any>": {
+            "type": "object",
+            "description": "Default parameters for tasks created under this project. Any parameters specified here will be set if omitted in a task request; they will be overridden by any values sent in the task request."
+          }
+        }
+      },
+      "UpdateOntology": {
+        "type": "object",
+        "required": ["ontology"],
+        "properties": {
+          "ontology": {
+            "type": "array",
+            "description": "A list of string or OntologyChoice objects.",
+            "example": ["chair", "table"]
+          },
+          "name": {
+            "type": "string",
+            "description": "Name identifying the version of the ontology."
+          }
+        }
+      }
+    }
+  }
+}

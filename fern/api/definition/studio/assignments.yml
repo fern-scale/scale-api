@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+service:
+  auth: true
+  base-path: /studio/assignments
+  endpoints:
+    list:
+      path: ""
+      method: GET
+      docs: >-
+        Gets the current project assignments of all active users in your team
+        (does not include “invited” or “disabled” team members).
+      display-name: List All Assignments
+      response: map<string, Assignment>
+
+    assignTeammate:
+      path: /add
+      method: POST
+      docs: >-
+        Assigns provided projects to specified team members. Returns all team
+        members and their assignments.
+      display-name: Assign Teammate
+      request:
+        body: AssignTeammate
+
+    unassignTeammate:
+      path: /remove
+      method: POST
+      docs: >-
+        Unassigns provided projects from specified team members. Returns all
+        team members and their assignments.
+      display-name: Unassign Teammate
+      request:
+        body: AssignTeammate
+
+types:
+  Assignment: list<string>
+
+  AssignTeammate:
+    properties:
+      emails:
+        docs: Array of emails of teammates.
+        type: list<string>
+      projects:
+        docs: Array of projects to assign.
+        type: list<string>
