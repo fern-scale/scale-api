@@ -3,6 +3,7 @@
 Tagging a release on this repository will update the:
 
 - [Node.js SDK repo](https://github.com/fern-scale/scale-node)
+- [Java SDK repo](https://github.com/fern-scale/scale-java)
 - [Postman collection repo](https://github.com/fern-scale/scale-postman)
 - _More SDKs to come..._
 
