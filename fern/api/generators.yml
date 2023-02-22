@@ -28,7 +28,7 @@ groups:
         version: 0.0.134
         output:
           location: maven
-          coordinate: io.github.fern-api/scale
+          coordinate: io.github.fern-api:scale
           username: ${FERN_MAVEN_USERNAME}
           password: ${FERN_MAVEN_TOKEN}
         github:
