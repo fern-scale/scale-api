@@ -3,7 +3,6 @@
 Tagging a release on this repository will update the:
 
 - [Node.js SDK repo](https://github.com/fern-scale/scale-node)
-- [Java SDK repo](https://github.com/fern-scale/scale-java)
 - [Postman collection repo](https://github.com/fern-scale/scale-postman)
 - _More SDKs to come..._
 
@@ -32,10 +31,6 @@ Generators read in your API Definition and output artifacts (e.g. the TypeScript
 To trigger the generators run:
 
 ```bash
-# output generated files locally
-fern generate
-
-# publish generated files
 fern generate --group publish --version <version>
 ```
 
