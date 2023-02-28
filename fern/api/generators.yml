@@ -1,18 +1,4 @@
-default-group: local
 groups:
-  local:
-    generators:
-      - name: fernapi/fern-typescript-sdk
-        version: 0.0.279
-        output:
-          location: local-file-system
-          path: ../../generated/typescript
-
-      - name: fernapi/fern-openapi
-        version: 0.0.19
-        output:
-          location: local-file-system
-          path: ../../generated/openapi
   publish:
     generators:
       - name: fernapi/fern-typescript-sdk
@@ -23,16 +9,8 @@ groups:
           token: ${FERN_NPM_TOKEN}
         github:
           repository: fern-scale/scale-node
-
-      - name: fernapi/fern-java-sdk
-        version: 0.0.134
-        output:
-          location: maven
-          coordinate: io.github.fern-api:scale
-          username: ${FERN_MAVEN_USERNAME}
-          password: ${FERN_MAVEN_TOKEN}
-        github:
-          repository: fern-scale/scale-java 
+        config:
+          namespaceExport: Scale
     
       - name: fernapi/fern-postman
         version: 0.0.34
