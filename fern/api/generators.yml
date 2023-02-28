@@ -2,16 +2,16 @@ groups:
   publish:
     generators:
       - name: fernapi/fern-typescript-sdk
-        version: 0.0.279
+        version: 0.2.2
         output:
           location: npm
           package-name: '@fern-api/scale'
           token: ${FERN_NPM_TOKEN}
         github:
-          repository: fern-scale/scale-node
+          repository: fern-scale/scaleapi-node-client
         config:
           namespaceExport: Scale
-    
+
       - name: fernapi/fern-postman
         version: 0.0.34
         output:
